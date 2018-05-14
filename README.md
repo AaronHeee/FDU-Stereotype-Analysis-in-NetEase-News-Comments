@@ -58,7 +58,7 @@ def sentiment_detect(text, region_dict):
 #### + 主题模型
 
 ```python
-def topic_model(text):
+def topic_detect(text):
   """
   与LDA的接口相同
   """
