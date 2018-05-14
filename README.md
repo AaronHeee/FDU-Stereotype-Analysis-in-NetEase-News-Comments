@@ -36,9 +36,9 @@
 ```python
 def region_detect(text):
     """
-	:param text: 所探测文本，数据格式：dataFrame,如df_content['content'],尺寸为(#content, 1)
-	:return id: 返回相关地域id, 上限为3个，数据格式：dataFrame,方便和原始数据拼接，尺寸为(#content, 3)
-	"""
+    :param text: 所探测文本，数据格式：dataFrame,如df_content['content'],尺寸为(#content, 1)
+    :return id: 返回相关地域id, 上限为3个，数据格式：dataFrame,方便和原始数据拼接，尺寸为(#content, 3)
+    """
 ```
 
 ## 建立模型
@@ -48,11 +48,11 @@ def region_detect(text):
 ```python
 def sentiment_detect(text, region_dict):
     """
-	:param text: 所探测文本，数据格式：dataFrame,如df_content['content'],尺寸为(#content, 1)
-	:param region_dict: 地域情感词计数器，数据格式：双重dict，例：region_dict[province][word]，每次查找到该次，词频会增加
-	:return dist: 返回这段话攻击的地域，数据格式：list [location1, location2...]
-	:return sentiment:返回正负向词汇统计信息三元组，数据格式：tuple (sentiment polar, #negative words, #positive words)
-	"""
+    :param text: 所探测文本，数据格式：dataFrame,如df_content['content'],尺寸为(#content, 1)
+    :param region_dict: 地域情感词计数器，数据格式：双重dict，例：region_dict[province][word]，每次查找到该次，词频会增加
+    :return dist: 返回这段话攻击的地域，数据格式：list [location1, location2...]
+    :return sentiment:返回正负向词汇统计信息三元组，数据格式：tuple (sentiment polar, #negative words, #positive words)
+    """
 ```
 
 #### + 主题模型
