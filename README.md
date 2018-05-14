@@ -25,11 +25,18 @@
 | 用户状态 userprofile | 用户状态的五位数值：\[是否有头像\]\[是否匿名]\[是否认证]\[是否VIP]\[是否红名] |
 | 发帖来源 source      | 发帖来源： wb即pc发贴，ph-ios即iphone端发贴，<br />ph-android即安卓端发贴，其他无法确认的默认均为ph。 |
 
-评论内容table: XXXXcontent.p
+评论内容table: ./data/XXXXcontent.p
 
 | 帖ID tie_id   | 评论帖的唯一键值 |
 | ------------ | -------- |
 | 评论内容 content | 评论帖的正文   |
+
+#### 数据读入
+```python
+import pandas as pd
+df_post = pd.read_pickle("./data/post.p")
+......
+```
 
 #### +  数据预处理 
 
