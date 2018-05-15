@@ -106,6 +106,7 @@ class Region(object):
         data = pd.concat([data, pd.DataFrame(data=res, columns=["src"])], axis=1)
         return data
 
+
 if __name__ == "__main__":
 
     # 初始化Region Class
@@ -117,7 +118,7 @@ if __name__ == "__main__":
         "潮汕人很帅，湖北人挺会做生意的！",
         "老铁牛逼！",
         "我觉得很好吃啊"
-        ]
+    ]
     df = pd.DataFrame(text, columns=["text"])
     print(df.head())
 
