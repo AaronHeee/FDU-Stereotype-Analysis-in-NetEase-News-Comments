@@ -34,7 +34,15 @@ def _ip_detect(ip):
     :param ip: IP明码，数据格式:str
     :return: 省份、城市信息，数据格式:tuple (省份，城市)
     """
-    
+    #淘宝IP地址库接口
+    r = requests.get('http://ip.taobao.com/service/getIpInfo.php?ip=%s' %ip)
+    if  r.json()['code'] == 0 :
+        i = r.json()['data']
+        provin = i['region']    #地区
+        city = i['city']        #城市
+
+        return (provin, city)
+
 
 class Region(object):
 
@@ -101,7 +109,7 @@ class Region(object):
 if __name__ == "__main__":
 
     # 初始化Region Class
-    path = "/Users/aaronhe/Documents/NutStore/Aaron He/FDU/Big-Data-Communication/Stereotype-Analysis-in-NetEase-News-Comments/Dict/region_dict/region.txt"
+    path = "./Dict/region_dict/region.txt"
     r = Region(path)
 
     # 构造输入数据
