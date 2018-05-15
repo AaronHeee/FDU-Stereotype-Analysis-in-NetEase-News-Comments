@@ -38,29 +38,52 @@ df_post = pd.read_pickle("./data/post.p")
 ......
 ```
 
-#### +  数据预处理 
 
-```python
-def region_detect(text):
-    """
-    :param text: 所探测文本，数据格式：dataFrame,如df_content['content'],尺寸为(#content, 1)
-    :return id: 返回相关地域id, 上限为3个，数据格式：dataFrame,方便和原始数据拼接，尺寸为(#content, 3)
-    """
-```
 
 ## 建立模型
 
-#### + 文本极性分析
+#### 地域探测: Region.py
 
 ```python
-def sentiment_detect(text, region_dict):
-    """
-    :param text: 所探测文本，数据格式：dataFrame,如df_content['content'],尺寸为(#content, 1)
-    :param region_dict: 地域情感词计数器，数据格式：双重dict，例：region_dict[province][word]，每次查找到该次，词频会增加
-    :return dist: 返回这段话攻击的地域，数据格式：list [location1, location2...]
-    :return sentiment:返回正负向词汇统计信息三元组，数据格式：tuple (sentiment polar, #negative words, #positive words)
-    """
+class Region(object):
+    def __init__(self, path):
+        """ 初始化Region类
+        :param path: 地域字典的绝对路径
+        """
+    def region_detect(self, data, on, id_num = 3):
+        """ 在dataFrame中批量添加region探测字段
+        :param data: 输入的dataFrame，数据格式：dataFrame，如df_post
+        :param on: dataFrame中探测的字段名，数据格式：list，如["post", "title"]
+        :param id_num: 探测的region数量，未探测则为0，数据格式：int，默认为3
+        :return: 返回已经添加了region探测字段的dataFrame
+        """
+     def ip_detect(self, data, on):
+        """ 在dataFrame中批量添加src探测字段
+        :param data: 输入的dataFrame，数据格式：dataFrame，如df_post
+        :param on: dataFrame中探测的字段名，数据格式：list，通常为["ip"]
+        :return:  返回已经添加了src探测字段的dataFrame
+        """
 ```
+
+
+
+#### 文本极性分析: Sentiment.py
+
+```python
+class Sentiment(object):
+    def sentiment_detect(self, data, on, srcs=None, dists=None):
+        """ 在dataFrame中批量添加"polar", "pos-words", "neg-words"字段
+        分别代表该条评论的情感极性、正向词汇个数、反向词汇个数
+        另外维护一个本地成员self.record，用来记录src->dist的评价词汇词频
+        :param data: 输入的dataFrame，数据格式：dataFrame，如df_post
+        :param on: dataFrame中探测的字段名，数据格式：list，通常为["content"]
+        :param srcs: dataFrame中表示评论用户所在地的字段名，数据格式：list,通常为["src"]
+        :param dists: dataFrame中表示被评论地区的字段名，数据格式：list,通常为["region_1", "region_2",...]
+        :return:  返回已经添加了polar, pos-words, neg-words探测字段的dataFrame
+        """
+```
+
+
 
 #### + 主题模型
 
@@ -75,11 +98,11 @@ def topic_detect(text):
 
 ## 任务安排
 
-占魁：数据读取 + 数据预处理
+占魁：把现有程序跑通
 
-小花：文本极性分析 + 主题模型(因为接口不变，所以很快)
+小花：ip定位函数
 
-之之：准备PPT：比如我们这README上的信息，我们以前讨论的论文，以及我们数据还没来所以自己造、以及咱们计划用的方法等。
+之之：完善地域词典，准备PPT
 
-Update 2018.05.14
+Update 2018.05.15
 

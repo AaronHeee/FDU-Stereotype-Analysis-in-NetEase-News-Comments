@@ -7,6 +7,8 @@
 # @Software: PyCharm
 
 import numpy as np
+import pandas as pd
+from multiprocessing import Pool, cpu_count
 import jieba
 
 
@@ -108,20 +110,29 @@ def LocateSpecialWord(pos_dict, neg_dict, not_dict, degree_dict, words):
         not_word: not word location dict
         degree_word: degree word location dict
     """
-    pos_word = {}
-    neg_word = {}
-    not_word = {}
-    degree_word = {}
+    # pos_word = {}
+    # neg_word = {}
+    # not_word = {}
+    # degree_word = {}
+
+    pos_word = []
+    neg_word = []
+    not_word = []
+    degree_word = []
 
     for index, word in enumerate(words):
         if word in pos_dict:
-            pos_word[index] = pos_dict[word]
+            # pos_word[index] = pos_dict[word]
+            pos_word.append(word)
         elif word in neg_dict:
-            neg_word[index] = neg_dict[word]
+            # neg_word[index] = neg_dict[word]
+            neg_word.append(word)
         elif word in not_dict:
-            not_word[index] = -1
+            # not_word[index] = -1
+            not_word.append(word)
         elif word in degree_dict:
-            degree_word[index] = degree_dict[word]
+            # degree_word[index] = degree_dict[word]
+            degree_word.append(word)
 
     return pos_word, neg_word, not_word, degree_word
 
@@ -224,4 +235,71 @@ def SentiFeatures(text):
 
     text_score = 1 if PosWord > NegWord else -1
 
-    return text_score, PosWord, NegWord
+    return text_score, PosWord, NegWord, pos_word, neg_word
+
+class Sentiment(object):
+
+    def __init__(self):
+        self.record = {}
+
+    def add_word(self, src, dist, polar, word):
+        key = (src, dist, polar)
+        if key in self.record:
+            if word in self.record[key]:
+                self.record[key][word] += 1
+            else:
+                self.record[key][word] = 1
+        else:
+            self.record[key] = {word: 1}
+
+    def reset_record(self):
+        self.record = {}
+
+    def output_record(self, src=None, dist=None, polar=None):
+        if src is not None and dist is None:
+            for key in self.record.keys():
+                if src == key[0]:
+                    for word in self.record[key].keys():
+                        print("%s ==> %s - sentiment %2d -- word %s -- frequency %d" % (src, key[1], key[2], word, self.record[key][word]) )
+
+    def sentiment_detect(self, data, on, srcs=None, dists=None):
+        """ 在dataFrame中批量添加"polar", "pos-words", "neg-words"字段
+        分别代表该条评论的情感极性、正向词汇个数、反向词汇个数
+        另外维护一个本地成员self.record，用来记录src->dist的评价词汇词频
+        :param data: 输入的dataFrame，数据格式：dataFrame，如df_post
+        :param on: dataFrame中探测的字段名，数据格式：list，通常为["content"]
+        :param srcs: dataFrame中表示评论用户所在地的字段名，数据格式：list,通常为["src"]
+        :param dists: dataFrame中表示被评论地区的字段名，数据格式：list,通常为["region_1", "region_2",...]
+        :return:  返回已经添加了polar, pos-words, neg-words探测字段的dataFrame
+        """
+
+        rows = [" ".join([row[i] for i in on]) for _, row in data.iterrows()]
+
+        pool = Pool(cpu_count())
+        results = pool.map(SentiFeatures, rows)
+        pool.close()
+        pool.join()
+
+        res = []
+        for i, row in data.iterrows():
+            print(results[i])
+            res.append(results[i][:3])
+
+            if (srcs and dists) is not None:
+                for s in srcs:
+                    src = row[s]
+                    for r in results[i][3]:
+                        for d in dists:
+                            dist = row[d]
+                            if dist:
+                                self.add_word(src, dist, 1, r)
+
+                    for r in results[i][4]:
+                        for d in dists:
+                            dist = row[d]
+                            if dist:
+                                self.add_word(src, dist, -1, r)
+
+        data = pd.concat([data, pd.DataFrame(data = res, columns=["polar", "pos-words", "neg-words"])], axis=1)
+
+        return data
