@@ -29,10 +29,12 @@ def _region_detect(row):
     return r
 
 def _ip_detect(ip):
-    URL = 'http://freeipapi.17mon.cn/' + ip
-    r = requests.get(URL, timeout=3)
-    json_data = r.json()
-    return(json_data[1])
+    """ 单个ip明码地理位置探测，写在外部，用于Region Class多进程程序ip_detect()
+
+    :param ip: IP明码，数据格式:str
+    :return: 省份、城市信息，数据格式:tuple (省份，城市)
+    """
+    
 
 class Region(object):
 
