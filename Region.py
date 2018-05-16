@@ -39,10 +39,12 @@ def _ip_detect(ip):
     r = requests.get('http://ip.taobao.com/service/getIpInfo.php?ip=%s' %ip)
     if  r.json()['code'] == 0 :
         i = r.json()['data']
-        provin = i['region']    #地区
-        city = i['city']        #城市
+        provin = i['region']    # 地区
+        city = i['city']        # 城市
 
         return (provin, city)
+    else:
+        return (0, 0) # 没有查询到
 
 
 class Region(object):
@@ -90,7 +92,7 @@ class Region(object):
         data = pd.concat([data, pd.DataFrame(data = res, index=data.index, columns=["region_%d" % (i+1) for i in range(id_num)])], axis=1)
         return data
 
-    def ip_detect(self, data, on):
+    def ip_detect(self, data, on, nbworker=cpu_count()):
         """ 在dataFrame中批量添加src探测字段
 
         :param data: 输入的dataFrame，数据格式：dataFrame，如df_post
@@ -99,12 +101,15 @@ class Region(object):
         """
         rows = ["".join([str(row[i]) for i in on]) for _, row in data.iterrows()]
 
-        pool = Pool(cpu_count())
-        res = pool.map(_ip_detect, tqdm(rows))
-        pool.close()
-        pool.join()
-
-        print(data)
+        if nbworker > 1:
+            pool = Pool(nbworker)
+            res = pool.map(_ip_detect, tqdm(rows))
+            pool.close()
+            pool.join()
+        else:
+            res = []
+            for row in tqdm(rows):
+                res.append(_ip_detect(row))
 
         data = pd.concat([data, pd.DataFrame(data=res, columns=["province", "city"], index=data.index)], axis=1)
         return data

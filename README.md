@@ -50,6 +50,7 @@ class Region(object):
         """ 初始化Region类
         :param path: 地域字典的绝对路径
         """
+        
     def region_detect(self, data, on, id_num = 3):
         """ 在dataFrame中批量添加region探测字段
         :param data: 输入的dataFrame，数据格式：dataFrame，如df_post
@@ -57,6 +58,7 @@ class Region(object):
         :param id_num: 探测的region数量，未探测则为0，数据格式：int，默认为3
         :return: 返回已经添加了region探测字段的dataFrame
         """
+        
      def ip_detect(self, data, on):
         """ 在dataFrame中批量添加src探测字段
         :param data: 输入的dataFrame，数据格式：dataFrame，如df_post
@@ -98,11 +100,37 @@ def topic_detect(text):
 
 ## 任务安排
 
-占魁：把现有程序跑通
+**大体：**等数据、考虑如何利用正文信息、印象标签提取、神经网络调优、借鉴现有论文去论证论文
 
-小花：ip定位函数
+**占魁：**数据可视化
 
-之之：完善地域词典，准备PPT
+**小花：**本地ip定位函数
 
-Update 2018.05.15
+**之之：**完善地域词典
+
+
+
+## 中期报告
+
+**周葆华老师：**
+
+- 数据（再催下数据！！）
+- 考虑一下偏差度 比如：会不会春节出去旅游啊之类的
+- 除了互黑地图，还可以做一个网络结构图
+- 增加标题和新闻的作用！看会不会引导新闻
+
+**周雅倩老师：** 
+
+- ip离线数据库：qqwry.dat
+- 评价metric，可以考虑抽样人工判定，给出准确率。
+  两个人判断 给出两个人评价的一致性，把平均值作为ground truth。
+
+**阳德青老师：**
+
+- 可以探讨更多社会意义的现象 比如：上海为什么没有安徽路
+- 人口输入输出要考虑 还有什么接壤
+
+
+
+Update 2018.05.16
 

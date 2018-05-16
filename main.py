@@ -49,14 +49,15 @@ def preprocess():
     print(len(df))
 
     # 模型加载
-    path_region_dict = "./Dict/region_dict/region.txt"
+    path_region_dict = "./Dict/region_dict/region_new.txt"
     r = Region(path_region_dict)
     # df = r.ip_detect(df.iloc[:10], on=["ip"])
     df = r.region_detect(df, on=["content"])
     df_select = df[df["region_1"] != 0]
-    print(df_select.head())
+    print(len(df_select))
+    print(df_select)
 
-    df_select = r.ip_detect(df_select, on=["ip"])
+    df_select = r.ip_detect(df_select.iloc[:10000], on=["ip"], nbworker=8)
     print(df_select.head())
 
     # 模型存储
@@ -76,11 +77,11 @@ def main():
     df_freq = s.table_record()
 
     # 结果保存
-    print(df)
-    print(df_freq)
+    df.to_pickle(os.path.join(path_prefix, "%s_sentiment.p" % date))
+    df_freq.to_pickle(os.path.join(path_prefix, "%s_senti_freq.p" % date))
 
 
 if __name__ == '__main__':
-    preprocess()
+    # preprocess()
     main()
 
