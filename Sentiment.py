@@ -12,7 +12,7 @@ from multiprocessing import Pool, cpu_count
 import jieba
 
 
-stop_words = [w.strip() for w in open('./dict/notWord.txt', 'r', encoding='GBK').readlines()]
+stop_words = [w.strip() for w in open('./Dict/notWord.txt', 'r', encoding='GBK').readlines()]
 stop_words.extend(['\n','\t',' '])
 
 
@@ -47,13 +47,13 @@ def LoadDict():
         degree_dict: degree word dict
     """
     # Sentiment word
-    pos_words = open('./dict/pos_word.txt').readlines()
+    pos_words = open('./Dict/pos_word.txt').readlines()
     pos_dict = {}
     for w in pos_words:
         word, score = w.strip().split(',')
         pos_dict[word] = float(score)
 
-    neg_words = open('./dict/neg_word.txt').readlines()
+    neg_words = open('./Dict/neg_word.txt').readlines()
     neg_dict = {}
     for w in neg_words:
         word, score = w.strip().split(',')
@@ -68,14 +68,14 @@ def LoadDict():
             neg_dict[word] = float(score)
 
     # Not word ['不', '没', '无', '非', '莫', '弗', '勿', '毋', '未', '否', '别', '無', '休', '难道']
-    not_words = open('./dict/notDict.txt').readlines()
+    not_words = open('./Dict/notDict.txt').readlines()
     not_dict = {}
     for w in not_words:
         word = w.strip()
         not_dict[word] = float(-1)
 
     # Degree word {'百分之百': 10.0, '倍加': 10.0, ...}
-    degree_words = open('./dict/degreeDict.txt').readlines()
+    degree_words = open('./Dict/degreeDict.txt').readlines()
     degree_dict = {}
     for w in degree_words:
         word, score = w.strip().split(',')
@@ -262,10 +262,26 @@ class Sentiment(object):
                     for word in self.record[key].keys():
                         print("%s ==> %s - sentiment %2d -- word %s -- frequency %d" % (src, key[1], key[2], word, self.record[key][word]) )
 
+    def table_record(self):
+        """ 将 self.record 字典作为DataFrame表返回
+
+        :return: 字段为src, dist, polar, word, freq的DataFrame表格，字段含义依次为：
+            用户所在地、用户评论目的地、评论情感极性、情感词、词频
+        """
+        res = []
+        for key in self.record.keys():
+            for word in self.record[key].keys():
+                freq = self.record[key][word]
+                res.append([key[0], key[1], key[2], word, freq])
+        return pd.DataFrame(res, columns=["src", "dist", "polar", "word", "freq"])
+
     def sentiment_detect(self, data, on, srcs=None, dists=None):
+
         """ 在dataFrame中批量添加"polar", "pos-words", "neg-words"字段
+
         分别代表该条评论的情感极性、正向词汇个数、反向词汇个数
         另外维护一个本地成员self.record，用来记录src->dist的评价词汇词频
+
         :param data: 输入的dataFrame，数据格式：dataFrame，如df_post
         :param on: dataFrame中探测的字段名，数据格式：list，通常为["content"]
         :param srcs: dataFrame中表示评论用户所在地的字段名，数据格式：list,通常为["src"]
@@ -281,8 +297,7 @@ class Sentiment(object):
         pool.join()
 
         res = []
-        for i, row in data.iterrows():
-            print(results[i])
+        for i, (_, row) in enumerate(data.iterrows()):
             res.append(results[i][:3])
 
             if (srcs and dists) is not None:
@@ -300,6 +315,6 @@ class Sentiment(object):
                             if dist:
                                 self.add_word(src, dist, -1, r)
 
-        data = pd.concat([data, pd.DataFrame(data = res, columns=["polar", "pos-words", "neg-words"])], axis=1)
+        data = pd.concat([data, pd.DataFrame(data = res, index=data.index, columns=["polar", "pos-words", "neg-words"])], axis=1)
 
         return data

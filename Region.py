@@ -6,6 +6,7 @@
 import pandas as pd
 from multiprocessing import Pool, cpu_count
 import requests
+from tqdm import tqdm
 
 ID_NUM = 3
 WORDPOOL = None
@@ -82,11 +83,11 @@ class Region(object):
         rows = [" ".join([row[i] for i in on]) for _, row in data.iterrows()]
 
         pool = Pool(cpu_count())
-        res = pool.map(_region_detect, rows)
+        res = pool.map(_region_detect, tqdm(rows))
         pool.close()
         pool.join()
 
-        data = pd.concat([data, pd.DataFrame(data = res, columns=["region_%d" % (i+1) for i in range(id_num)])], axis=1)
+        data = pd.concat([data, pd.DataFrame(data = res, index=data.index, columns=["region_%d" % (i+1) for i in range(id_num)])], axis=1)
         return data
 
     def ip_detect(self, data, on):
@@ -96,16 +97,17 @@ class Region(object):
         :param on: dataFrame中探测的字段名，数据格式：list，通常为["ip"]
         :return:  返回已经添加了src探测字段的dataFrame
         """
-        rows = [" ".join([row[i] for i in on]) for _, row in data.iterrows()]
+        rows = ["".join([str(row[i]) for i in on]) for _, row in data.iterrows()]
 
         pool = Pool(cpu_count())
-        res = pool.map(_ip_detect, rows)
+        res = pool.map(_ip_detect, tqdm(rows))
         pool.close()
         pool.join()
 
-        data = pd.concat([data, pd.DataFrame(data=res, columns=["src"])], axis=1)
-        return data
+        print(data)
 
+        data = pd.concat([data, pd.DataFrame(data=res, columns=["province", "city"], index=data.index)], axis=1)
+        return data
 
 if __name__ == "__main__":
 
@@ -118,7 +120,7 @@ if __name__ == "__main__":
         "潮汕人很帅，湖北人挺会做生意的！",
         "老铁牛逼！",
         "我觉得很好吃啊"
-    ]
+        ]
     df = pd.DataFrame(text, columns=["text"])
     print(df.head())
 
