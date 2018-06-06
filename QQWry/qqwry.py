@@ -449,7 +449,7 @@ def parse_cmd_args():
 def main():
 
     args = parse_cmd_args()
-
+    
     ## 是否需要更新
 
     # 1. 指定更新
@@ -486,8 +486,14 @@ def main():
         qqwry.output()
 
 
+def ip_detect(ip):
+    qqwry = QQWry('./qqwry.dat')
+    c, a = qqwry.query(ip)
+    print('%15s %s %s' % (ip, c, a))
+
 if __name__ == '__main__':
-    main()
+    # main()
+    ip_detect('59.57.251.57')
 
 
 
