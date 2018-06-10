@@ -49,6 +49,6 @@ while True:
     try:
         login(username, password)
     except:
-        print 'Fail...'
+        print('Fail...')
         pass
     time.sleep(300)
