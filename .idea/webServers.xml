@@ -10,6 +10,14 @@
           <option name="port" value="22" />
         </fileTransfer>
       </webServer>
+      <webServer id="51005d23-f61d-4e76-a498-81e723265d59" name="vpn" url="http://206.189.168.119">
+        <fileTransfer host="206.189.168.119" port="22" rootFolder="/root" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>
