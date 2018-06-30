@@ -37,7 +37,7 @@ def preprocess():
 
     # 数据读入
     date = sys.argv[1]
-    path_prefix = "./data"
+    path_prefix = "./new_data"
     df = pd.read_pickle(os.path.join(path_prefix, "%s.p" % date))
     df_content = pd.read_pickle(os.path.join(path_prefix, "%scontent.p" % date))
     df_post = pd.read_pickle(os.path.join(path_prefix, "%spost.p" % date))
@@ -57,7 +57,7 @@ def preprocess():
     print(len(df_select))
     print(df_select)
 
-    df_select = r.ip_detect(df_select.iloc[:10000], on=["ip"], nbworker=8)
+    df_select = r.ip_detect(df_select.iloc[:], on=["ip"], nbworker=8)
     print(df_select.head())
 
     # 模型存储
@@ -68,7 +68,7 @@ def preprocess():
 def main():
     # 数据加载
     date = sys.argv[1]
-    path_prefix = "./data"
+    path_prefix = "./new_data"
     df = pd.read_pickle(os.path.join(path_prefix, "%s_select_comments.p" % date))
 
     # 模型加载
@@ -79,9 +79,11 @@ def main():
     # 结果保存
     df.to_pickle(os.path.join(path_prefix, "%s_sentiment.p" % date))
     df_freq.to_pickle(os.path.join(path_prefix, "%s_senti_freq.p" % date))
+    print(df)
+    print(df_freq)
 
 
 if __name__ == '__main__':
-    # preprocess()
+    preprocess()
     main()
 
